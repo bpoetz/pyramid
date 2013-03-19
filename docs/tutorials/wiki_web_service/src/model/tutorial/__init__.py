@@ -1,10 +1,6 @@
 from pyramid.config import Configurator
-from pyramid.authentication import AuthTktAuthenticationPolicy
-from pyramid.authorization import ACLAuthorizationPolicy
 
 from sqlalchemy import engine_from_config
-
-from tutorial.security import groupfinder
 
 from .models import (
     DBSession,
@@ -20,20 +16,13 @@ def main(global_config, **settings):
     engine = engine_from_config(settings, 'sqlalchemy.')
     DBSession.configure(bind=engine)
     Base.metadata.bind = engine
-    authn_policy = AuthTktAuthenticationPolicy(
-        'sosecret', callback=groupfinder, hashalg='sha512')
-    authz_policy = ACLAuthorizationPolicy()
     config = Configurator(settings=settings,
                           root_factory='tutorial.models.RootFactory')
-    config.set_authentication_policy(authn_policy)
-    config.set_authorization_policy(authz_policy)
     config.add_static_view('static', 'static', cache_max_age=3600)
     config.add_route('view_wiki', '/')
-    config.add_route('login', '/login')
-    config.add_route('logout', '/logout')
-    config.add_route('view_page', '/{pagename}')
-    config.add_route('add_page', '/add_page/{pagename}')
-    config.add_route('edit_page', '/{pagename}/edit_page')
+    config.add_route('page_get', '/{pagename}')
+    config.add_route('page_post', '/{pagename}')
+    #config.add_route('page_delete', '/{pagename}')
     config.add_renderer('json', json_renderer)
     config.scan()
     return config.make_wsgi_app()
