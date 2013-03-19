@@ -7,7 +7,7 @@ from pyramid.httpexceptions import (
 
 from pyramid.view import (
     view_config,
-    forbidden_view_config,
+    view_defaults,
     )
 
 from .models import (
@@ -24,43 +24,48 @@ def view_wiki(request):
     return dict()
 
 
-@view_config(route_name='page_get', request_method='GET',
-             renderer='json')
-def page_get(request):
-    pagename = request.matchdict['pagename']
-    page = DBSession.query(Page).filter_by(name=pagename).first()
-    if page is None:
-        return dict(error='No such page', name=pagename)
+@view_defaults(route_name='page', renderer='json')
+class PageView(object):
 
-    return dict(page=page, wikiwords=wikiwords.findall(page.data))
+    def __init__(self,request):
+        self.request = request
 
+    @view_config(request_method='GET')
+    def get(self):
+        pagename = self.request.matchdict['pagename']
+        page = DBSession.query(Page).filter_by(name=pagename).first()
+        if page is None:
+            return dict(error='No such page', name=pagename)
 
-@view_config(route_name='page_post', request_method='POST',
-             renderer='json')
-def page_post(request):
-    import q;q(request)
-    name = request.matchdict['pagename']
-    page_post_data = request.POST['data']
-
-    page = DBSession.query(Page).filter_by(name=name).first()
-    if page:
-        page.data = page_post_data['data']
-    else:
-        page = Page(**page_post_data)
-        DBSession.add(page)
-
-    return dict(page=page)
+        return dict(page=page, wikiwords=wikiwords.findall(page.data))
 
 
-@view_config(route_name='page_delete', request_method='DELETE',
-             renderer='json')
-def page_delete(request):
-    pagename = request.matchdict['pagename']
+    @view_config(request_method='POST')
+    def post(self):
 
-    page = DBSession.query(Page).filter_by(name=pagename).first()
-    if page:
-        DBSession.delete(page)
-    else:
-        return dict(error='No such page')
+        name = self.request.matchdict['pagename']
+        page_post_data = self.request.POST['data']
+        import q;q.q(self.request.POST)
 
-    return dict()
+
+        page = DBSession.query(Page).filter_by(name=name).first()
+        if page:
+            page.data = page_post_data
+        else:
+            page = Page(name, page_post_data)
+            DBSession.add(page)
+
+        return dict(page=page, wikiwords=wikiwords.findall(page.data))
+
+
+    @view_config( request_method='DELETE')
+    def delete(self):
+        pagename = self.request.matchdict['pagename']
+
+        page = DBSession.query(Page).filter_by(name=pagename).first()
+        if page:
+            DBSession.delete(page)
+        else:
+            return dict(error='No such page')
+
+        return dict()

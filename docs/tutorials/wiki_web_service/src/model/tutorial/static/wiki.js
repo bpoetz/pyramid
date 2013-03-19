@@ -11,10 +11,11 @@
       var wikiword;
       wikiword = $('#name').html();
       return $.ajax({
-        'type': 'POST',
-        'url': wikiword,
-        'data': {data: $('textbox').html(),
-                }
+        type: 'POST',
+        url: wikiword,
+        data: {data: $('textarea').html(),
+                },
+        dataType: 'json',
       }).done(replace_html);
     };
     replace_html = function(data) {
