@@ -120,8 +120,8 @@ class PagePostTests(unittest.TestCase):
             post={'page': {'name': 'AnotherPage', 'data': 'Hello yo!'}}
         )
         request.matchdict = {'pagename': 'AnotherPage'}
+        self._callFUT(request)
         page = self.session.query(Page).filter_by(name='AnotherPage').one()
-        page = self._callFUT(request)
         self.assertEqual(page.data, 'Hello yo!')
 
     def test_page_post_create_page(self):
@@ -134,32 +134,6 @@ class PagePostTests(unittest.TestCase):
         self._callFUT(request)
         page = self.session.query(Page).filter_by(name='AnotherPage').one()
         self.assertEqual(page.data, 'Hello yo!')
-
-
-# class EditPageTests(unittest.TestCase):
-#     def setUp(self):
-#         self.session = _initTestingDB()
-#         self.config = testing.setUp()
-
-#     def tearDown(self):
-#         self.session.remove()
-#         testing.tearDown()
-
-#     def _callFUT(self, request):
-#         from tutorial.views import edit_page
-#         return edit_page(request)
-
-#     def test_it_notsubmitted(self):
-#         from tutorial.models import Page
-#         _registerRoutes(self.config)
-#         request = testing.DummyRequest()
-#         request.matchdict = {'pagename':'abc'}
-#         page = Page('abc', 'hello')
-#         self.session.add(page)
-#         info = self._callFUT(request)
-#         self.assertEqual(info['page'], page)
-#         self.assertEqual(info['save_url'],
-#             'http://example.com/abc/edit_page')
 
 
 # class FunctionalTests(unittest.TestCase):

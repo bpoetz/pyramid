@@ -38,13 +38,12 @@ def page_get(request):
              renderer='json')
 def page_post(request):
     pagename = request.matchdict['pagename']
-    data = request.POST['page']
+    page_post_data = request.POST['page']
 
     page = DBSession.query(Page).filter_by(name=pagename).first()
     if page:
-        DBSession.update(**data)
-        page = DBSession.query(Page).filter_by(name=pagename).first()
+        page.data = page_post_data['data']
     else:
-        page = Page(**data)
+        page = Page(**page_post_data)
         DBSession.add(page)
     return dict(page=page)
