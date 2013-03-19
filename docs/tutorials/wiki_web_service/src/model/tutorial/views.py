@@ -37,9 +37,6 @@ def page_get(request):
 @view_config(route_name='page_post', request_method='POST',
              renderer='json')
 def page_post(request):
-    # model as json
-        # upsert
-        # return exception or updated date
     pagename = request.matchdict['pagename']
     data = request.POST['page']
 
@@ -51,18 +48,3 @@ def page_post(request):
         page = Page(**data)
         DBSession.add(page)
     return dict(page=page)
-
-# @view_config(route_name='edit_page', request_method='GET',
-#              renderer='json')
-# def edit_page(request):
-#     pagename = request.matchdict['pagename']
-#     page = DBSession.query(Page).filter_by(name=pagename).one()
-#     if 'form.submitted' in request.params:
-#         page.data = request.params['body']
-#         DBSession.add(page)
-#         return HTTPFound(location = request.route_url('view_page',
-#                                                       pagename=pagename))
-#     return dict(
-#         page=page,
-#         save_url = request.route_url('edit_page', pagename=pagename),
-#         )
