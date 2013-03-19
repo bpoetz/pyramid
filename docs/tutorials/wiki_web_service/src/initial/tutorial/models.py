@@ -7,6 +7,7 @@ from sqlalchemy import (
     Column,
     Integer,
     Text,
+    DateTime,
     )
 
 from sqlalchemy.ext.declarative import declarative_base
@@ -28,10 +29,13 @@ class Page(Base):
     id = Column(Integer, primary_key=True)
     name = Column(Text, unique=True)
     data = Column(Text)
+    date = Column(DateTime)
 
-    def __init__(self, name, data):
+    def __init__(self, name, data, date):
         self.name = name
         self.data = data
+        self.date = date
+        
 
 class RootFactory(object):
     __acl__ = [ (Allow, Everyone, 'view'),

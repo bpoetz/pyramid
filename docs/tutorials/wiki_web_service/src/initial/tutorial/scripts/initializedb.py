@@ -1,6 +1,7 @@
 import os
 import sys
 import transaction
+from datetime import datetime
 
 from sqlalchemy import engine_from_config
 
@@ -33,5 +34,5 @@ def main(argv=sys.argv):
     DBSession.configure(bind=engine)
     Base.metadata.create_all(engine)
     with transaction.manager:
-        model = Page('FrontPage', 'This is the front page')
+        model = Page('FrontPage', 'This is the front page', datetime.now())
         DBSession.add(model)
