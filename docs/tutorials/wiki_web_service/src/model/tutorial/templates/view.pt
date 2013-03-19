@@ -6,6 +6,7 @@
   <title>Pyramid tutorial wiki (based on
     TurboGears 20-Minute Wiki)</title>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+  <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
   <meta name="keywords" content="python web application" />
   <meta name="description" content="pyramid web application" />
   <link rel="shortcut icon"
@@ -36,7 +37,7 @@
     <div id="middle">
       <div class="middle align-right">
         <div id="left" class="app-welcome align-left">
-          Viewing <b><span id="page_name">Default Page</span></b><br/>
+          Viewing <b><span id="name">Default Page</span></b><br/>
         </div>
         <div id="right" class="app-welcome align-right">
           <span id='error'>
@@ -46,13 +47,14 @@
     </div>
     <div id="bottom">
       <div class="bottom">
-        <div id="page_data">here is an example page. This is a Wiki Word in the text.
+        <div id="data">here is an example page. This is a Wiki Word in the text.
         </div>
-        <ul id="page_wikiwords">
-          <li><a href="this">This</a></li>
-          <li><a href="wiki">Wiki</a></li>
-          <li><a href="word">Word</a></li>
-        <div id='page_updated'>2013-03-15 13:01:01
+        <ul id="wikiwords">
+          <li><a class="wikiword">This</a></li>
+          <li><a class="wikiword">Wiki</a></li>
+          <li><a class="wikiword">Word</a></li>
+        </ul>
+        <div id='updated'>2013-03-15 13:01:01
         </div>
 
            <label for="data">Text:</label>

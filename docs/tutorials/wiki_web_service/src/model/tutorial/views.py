@@ -28,17 +28,18 @@ def page_get(request):
     pagename = request.matchdict['pagename']
     page = DBSession.query(Page).filter_by(name=pagename).first()
     if page is None:
-        return dict(error='No such page')
+        return dict(error='No such page', name=pagename)
 
     return dict(page=page, wikiwords=wikiwords.findall(page.data))
 
 @view_config(route_name='page_post', request_method='POST',
              renderer='json')
 def page_post(request):
-    pagename = request.matchdict['pagename']
-    page_post_data = request.POST['page']
+    import q;q(request)
+    name = request.matchdict['pagename']
+    page_post_data = request.POST['data']
 
-    page = DBSession.query(Page).filter_by(name=pagename).first()
+    page = DBSession.query(Page).filter_by(name=name).first()
     if page:
         page.data = page_post_data['data']
     else:
