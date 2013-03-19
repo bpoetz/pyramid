@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pyramid.security import (
     Allow,
     Everyone,
@@ -29,13 +31,20 @@ class Page(Base):
     id = Column(Integer, primary_key=True)
     name = Column(Text, unique=True)
     data = Column(Text)
-    date = Column(DateTime)
+    updated = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
-    def __init__(self, name, data, date):
+    def __init__(self, name, data):
         self.name = name
         self.data = data
-        self.date = date
-        
+
+    def __json__(self, request):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'data': self.data,
+            'updated': self.updated,
+        }
+
 
 class RootFactory(object):
     __acl__ = [ (Allow, Everyone, 'view'),
