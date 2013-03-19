@@ -33,6 +33,8 @@ Pyramid Web Services Tutorial
 2. update the initialize_db field
 3. run the initialize_tutorial_db script to add the column to the DB.
 
+JSON does not natively support datetime serialization.
+
 Next we can modify our views.py
 
 1.  first

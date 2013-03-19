@@ -33,7 +33,7 @@ def view_wiki(request):
     return HTTPFound(location = request.route_url('view_page',
                                                   pagename='FrontPage'))
 
-@view_config(route_name='view_page', renderer='templates/view.pt',
+@view_config(route_name='view_page', renderer='json',
              permission='view')
 def view_page(request):
     pagename = request.matchdict['pagename']
@@ -46,13 +46,16 @@ def view_page(request):
         exists = DBSession.query(Page).filter_by(name=word).all()
         if exists:
             view_url = request.route_url('view_page', pagename=word)
-            return '<a href="%s">%s</a>' % (view_url, word)
+            # return '<a href="%s">%s</a>' % (view_url, word)
+            return (view_url, word)
         else:
             add_url = request.route_url('add_page', pagename=word)
-            return '<a href="%s">%s</a>' % (add_url, word)
+            # return '<a href="%s">%s</a>' % (add_url, word)
+            return (add_url, word)
 
     content = publish_parts(page.data, writer_name='html')['html_body']
     content = wikiwords.sub(check, content)
+
     edit_url = request.route_url('edit_page', pagename=pagename)
     return dict(page=page, content=content, edit_url=edit_url,
                 logged_in=authenticated_userid(request))
@@ -121,4 +124,4 @@ def logout(request):
     headers = forget(request)
     return HTTPFound(location = request.route_url('view_wiki'),
                      headers = headers)
-    
+

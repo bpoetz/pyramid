@@ -11,6 +11,8 @@ from .models import (
     Base,
     )
 
+from .renderers import json_renderer
+
 
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
@@ -32,5 +34,6 @@ def main(global_config, **settings):
     config.add_route('view_page', '/{pagename}')
     config.add_route('add_page', '/add_page/{pagename}')
     config.add_route('edit_page', '/{pagename}/edit_page')
+    config.add_renderer('json', json_renderer)
     config.scan()
     return config.make_wsgi_app()
