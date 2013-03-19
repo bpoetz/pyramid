@@ -46,59 +46,56 @@ class PageModelTests(unittest.TestCase):
         self.assertEqual(instance.data, 'some data')
 
 
-# class ViewWikiTests(unittest.TestCase):
-#     def setUp(self):
-#         self.config = testing.setUp()
+class ViewWikiTests(unittest.TestCase):
+    def setUp(self):
+        self.config = testing.setUp()
 
-#     def tearDown(self):
-#         testing.tearDown()
+    def tearDown(self):
+        testing.tearDown()
 
-#     def _callFUT(self, request):
-#         from tutorial.views import view_wiki
-#         return view_wiki(request)
+    def _callFUT(self, request):
+        from tutorial.views import view_wiki
+        return view_wiki(request)
 
-#     def test_it(self):
-#         _registerRoutes(self.config)
-#         request = testing.DummyRequest()
-#         response = self._callFUT(request)
-#         self.assertEqual(response.location, 'http://example.com/FrontPage')
+    def test_it(self):
+        _registerRoutes(self.config)
+        request = testing.DummyRequest()
+        response = self._callFUT(request)
+        self.assertEqual({}, response)
 
 
-# class ViewPageTests(unittest.TestCase):
-#     def setUp(self):
-#         self.session = _initTestingDB()
-#         self.config = testing.setUp()
+class PageGetTests(unittest.TestCase):
+    def setUp(self):
+        self.session = _initTestingDB()
+        self.config = testing.setUp()
 
-#     def tearDown(self):
-#         self.session.remove()
-#         testing.tearDown()
+    def tearDown(self):
+        self.session.remove()
+        testing.tearDown()
 
-#     def _callFUT(self, request):
-#         from tutorial.views import view_page
-#         return view_page(request)
+    def _callFUT(self, request):
+        from tutorial.views import page_get
+        return page_get(request)
 
-#     def test_it(self):
-#         from tutorial.models import Page
-#         request = testing.DummyRequest()
-#         request.matchdict['pagename'] = 'IDoExist'
-#         page = Page('IDoExist', 'Hello CruelWorld IDoExist')
-#         self.session.add(page)
-#         _registerRoutes(self.config)
-#         info = self._callFUT(request)
-#         self.assertEqual(info['page'], page)
-#         self.assertEqual(
-#             info['content'],
-#             '<div class="document">\n'
-#             '<p>Hello <a href="http://example.com/add_page/CruelWorld">'
-#             'CruelWorld</a> '
-#             '<a href="http://example.com/IDoExist">'
-#             'IDoExist</a>'
-#             '</p>\n</div>\n')
-#         self.assertEqual(info['edit_url'],
-#             'http://example.com/IDoExist/edit_page')
+    def test_it(self):
+        from datetime import datetime
+        from tutorial.models import Page
+        request = testing.DummyRequest()
+        request.matchdict['pagename'] = 'IDoExist'
+        page = Page('IDoExist', 'Hello CruelWorld IDoExist')
+        self.session.add(page)
+        _registerRoutes(self.config)
+        resp = self._callFUT(request)
+        self.assertEqual(resp['page'].name, 'IDoExist')
+        self.assertEqual(resp['page'].data, 'Hello CruelWorld IDoExist')
+        self.assertIsInstance(
+            resp['page'].updated,
+            datetime,
+        )
 
 
 class PagePostTests(unittest.TestCase):
+
     def setUp(self):
         self.session = _initTestingDB()
         self.config = testing.setUp()
@@ -136,35 +133,54 @@ class PagePostTests(unittest.TestCase):
         self.assertEqual(page.data, 'Hello yo!')
 
 
-# class FunctionalTests(unittest.TestCase):
+class PageDeleteTests(unittest.TestCase):
 
-#     viewer_login = '/login?login=viewer&password=viewer' \
-#                    '&came_from=FrontPage&form.submitted=Login'
-#     viewer_wrong_login = '/login?login=viewer&password=incorrect' \
-#                    '&came_from=FrontPage&form.submitted=Login'
-#     editor_login = '/login?login=editor&password=editor' \
-#                    '&came_from=FrontPage&form.submitted=Login'
+    def setUp(self):
+        self.session = _initTestingDB()
+        self.config = testing.setUp()
 
-#     def setUp(self):
-#         from tutorial import main
-#         settings = { 'sqlalchemy.url': 'sqlite://'}
-#         app = main({}, **settings)
-#         from webtest import TestApp
-#         self.testapp = TestApp(app)
-#         _initTestingDB()
+    def tearDown(self):
+        self.session.remove()
+        testing.tearDown()
 
-#     def tearDown(self):
-#         del self.testapp
-#         from tutorial.models import DBSession
-#         DBSession.remove()
+    def _callFUT(self, request):
+        from tutorial.views import page_delete
+        return page_delete(request)
 
-#     def test_root(self):
-#         res = self.testapp.get('/', status=302)
-#         self.assertEqual(res.location, 'http://localhost/FrontPage')
+    def test_page_post_delete_page(self):
+        from tutorial.models import Page
+        _registerRoutes(self.config)
+        page = Page('AnotherPage', 'hello yo!')
+        self.session.add(page)
+        request = testing.DummyRequest(method='DELETE')
+        request.matchdict = {'pagename': 'AnotherPage'}
+        self._callFUT(request)
+        page = self.session.query(Page).filter_by(name='AnotherPage').all()
+        self.assertEqual([], page)
 
-#     def test_FrontPage(self):
-#         res = self.testapp.get('/FrontPage', status=200)
-#         self.assertTrue(b'FrontPage' in res.body)
 
-#     def test_unexisting_page(self):
-#         self.testapp.get('/SomePage', status=404)
+class FunctionalTests(unittest.TestCase):
+
+    def setUp(self):
+        from tutorial import main
+        settings = {'sqlalchemy.url': 'sqlite://'}
+        app = main({}, **settings)
+        from webtest import TestApp
+        self.testapp = TestApp(app)
+        _initTestingDB()
+
+    def tearDown(self):
+        del self.testapp
+        from tutorial.models import DBSession
+        DBSession.remove()
+
+    def test_FrontPage(self):
+        res = self.testapp.get('/FrontPage', status=200)
+        self.assertTrue(b'page' in res.json)
+
+    def test_unexisting_page(self):
+        self.testapp.get('/SomePage', status=404)
+
+    def test_root(self):
+        res = self.testapp.get('/', status=200)
+        self.assertEqual(res.location, None)

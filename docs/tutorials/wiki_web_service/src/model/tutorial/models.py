@@ -44,10 +44,3 @@ class Page(Base):
             'data': self.data,
             'updated': self.updated,
         }
-
-
-class RootFactory(object):
-    __acl__ = [ (Allow, Everyone, 'view'),
-                (Allow, 'group:editors', 'edit') ]
-    def __init__(self, request):
-        pass
