@@ -35,7 +35,14 @@ class Page(Base):
         self.name = name
         self.data = data
         self.date = date
-        
+
+    def __json__(self, request):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'data': self.data,
+        }
+
 
 class RootFactory(object):
     __acl__ = [ (Allow, Everyone, 'view'),
