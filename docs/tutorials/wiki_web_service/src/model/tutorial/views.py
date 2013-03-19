@@ -1,5 +1,4 @@
 import re
-from docutils.core import publish_parts
 
 from pyramid.httpexceptions import (
     HTTPFound,
@@ -19,10 +18,9 @@ from .models import (
 # regular expression used to find WikiWords
 wikiwords = re.compile(r"\b([A-Z]\w+[A-Z]+\w+)")
 
-@view_config(route_name='view_wiki')
+@view_config(route_name='home', renderer='templates/view.pt')
 def view_wiki(request):
-    return HTTPFound(location = request.route_url('view_page',
-                                                  pagename='FrontPage'))
+    return dict()
 
 @view_config(route_name='page_get', request_method='GET',
              renderer='json')
