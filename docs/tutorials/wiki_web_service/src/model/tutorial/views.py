@@ -27,7 +27,7 @@ def view_wiki(request):
 @view_defaults(route_name='page', renderer='json')
 class PageView(object):
 
-    def __init__(self,request):
+    def __init__(self, request):
         self.request = request
 
     @view_config(request_method='GET')
