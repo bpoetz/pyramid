@@ -37,7 +37,7 @@
     <div id="middle">
       <div class="middle align-right">
         <div id="left" class="app-welcome align-left">
-          Viewing <b><span id="name">Default Page</span></b><br/>
+          Viewing <b><span class="name"></span></b><br/>
         </div>
         <div id="right" class="app-welcome align-right">
           <span id='error'>
@@ -47,20 +47,16 @@
     </div>
     <div id="bottom">
       <div class="bottom">
-        <div id="data">here is an example page. This is a Wiki Word in the text.
-        </div>
+        <div class="data"></div>
         <ul id="wikiwords">
-          <li><a class="wikiword">This</a></li>
-          <li><a class="wikiword">Wiki</a></li>
-          <li><a class="wikiword">Word</a></li>
         </ul>
-        <div id='updated'>2013-03-15 13:01:01
-        </div>
-
-           <label for="data">Text:</label>
-           <textarea name="data" rows="10" cols="60"></textarea>
+        <span id='updated'>
+        </span>
+        <br />
+          <input type='text' class='name' value=""></input>
+          <textarea class='data' name="data" rows="10" cols="60"></textarea>
            <br/>
-           <button name="edit" value="Edit">Edit</button>
+           <button name="edit" value="Edit">Post JSON To Server</button>
     </div>
     </div>
   </div>
