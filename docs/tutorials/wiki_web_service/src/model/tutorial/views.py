@@ -39,26 +39,21 @@ class PageView(object):
 
         return dict(page=page, wikiwords=wikiwords.findall(page.data))
 
-
     @view_config(request_method='POST')
     def post(self):
-
         name = self.request.matchdict['pagename']
-        page_post_data = self.request.POST['data']
-        import q;q.q(self.request.POST)
-
+        page_data = self.request.json['page']
 
         page = DBSession.query(Page).filter_by(name=name).first()
         if page:
-            page.data = page_post_data
+            page.data = page_data['data']
         else:
-            page = Page(name, page_post_data)
+            page = Page(name=name, data=page_data['data'])
             DBSession.add(page)
 
         return dict(page=page, wikiwords=wikiwords.findall(page.data))
 
-
-    @view_config( request_method='DELETE')
+    @view_config(request_method='DELETE')
     def delete(self):
         pagename = self.request.matchdict['pagename']
 
