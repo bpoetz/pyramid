@@ -52,14 +52,14 @@ class ViewWikiTests(unittest.TestCase):
     def tearDown(self):
         testing.tearDown()
 
-    def _callFUT(self, request):
+    def _call_view_under_test(self, request):
         from tutorial.views import view_wiki
         return view_wiki(request)
 
     def test_it(self):
         _registerRoutes(self.config)
         request = testing.DummyRequest()
-        response = self._callFUT(request)
+        response = self._call_view_under_test(request)
         self.assertEqual({}, response)
 
 
@@ -72,7 +72,7 @@ class PageGetTests(unittest.TestCase):
         self.session.remove()
         testing.tearDown()
 
-    def _callFUT(self, request):
+    def _call_view_under_test(self, request):
         from tutorial.views import PageView
         return PageView(request).get()
 
@@ -84,7 +84,7 @@ class PageGetTests(unittest.TestCase):
         page = Page('IDoExist', 'Hello CruelWorld IDoExist')
         self.session.add(page)
         _registerRoutes(self.config)
-        resp = self._callFUT(request)
+        resp = self._call_view_under_test(request)
         self.assertEqual(resp['page'].name, 'IDoExist')
         self.assertEqual(resp['page'].data, 'Hello CruelWorld IDoExist')
         self.assertIsInstance(
@@ -103,7 +103,7 @@ class PagePostTests(unittest.TestCase):
         self.session.remove()
         testing.tearDown()
 
-    def _callFUT(self, request):
+    def _call_view_under_test(self, request):
         from tutorial.views import PageView
         return PageView(request).post()
 
@@ -116,7 +116,7 @@ class PagePostTests(unittest.TestCase):
         request.matchdict = {'pagename': 'AnotherPage'}
         json = {'page': {'name': 'AnotherPage', 'data': 'Hello yo!'}}
         request.json = json
-        self._callFUT(request)
+        self._call_view_under_test(request)
         page = self.session.query(Page).filter_by(name='AnotherPage').one()
         self.assertEqual(page.data, 'Hello yo!')
 
@@ -127,7 +127,7 @@ class PagePostTests(unittest.TestCase):
         request.matchdict = {'pagename': 'AnotherPage'}
         json = {'page': {'name': 'AnotherPage', 'data': 'Hello yo!'}}
         request.json = json
-        self._callFUT(request)
+        self._call_view_under_test(request)
         page = self.session.query(Page).filter_by(name='AnotherPage').one()
         self.assertEqual(page.data, 'Hello yo!')
 
