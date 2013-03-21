@@ -21,8 +21,7 @@ def _initTestingDB():
 
 
 def _registerRoutes(config):
-    config.add_route('page_get', '/{pagename}')
-    config.add_route('page_post', '/{pagename}')
+    config.add_route('page', '/{pagename}')
 
 
 class PageModelTests(unittest.TestCase):
@@ -74,8 +73,8 @@ class PageGetTests(unittest.TestCase):
         testing.tearDown()
 
     def _callFUT(self, request):
-        from tutorial.views import page_get
-        return page_get(request)
+        from tutorial.views import PageView
+        return PageView(request).get()
 
     def test_it(self):
         from datetime import datetime
@@ -105,18 +104,18 @@ class PagePostTests(unittest.TestCase):
         testing.tearDown()
 
     def _callFUT(self, request):
-        from tutorial.views import page_post
-        return page_post(request)
+        from tutorial.views import PageView
+        return PageView(request).post()
 
     def test_page_post_update_page(self):
         from tutorial.models import Page
         _registerRoutes(self.config)
         page = Page('AnotherPage', 'hello yo!')
         self.session.add(page)
-        request = testing.DummyRequest(
-            post={'page': {'name': 'AnotherPage', 'data': 'Hello yo!'}}
-        )
+        request = testing.DummyRequest()
         request.matchdict = {'pagename': 'AnotherPage'}
+        json = {'page': {'name': 'AnotherPage', 'data': 'Hello yo!'}}
+        request.json = json
         self._callFUT(request)
         page = self.session.query(Page).filter_by(name='AnotherPage').one()
         self.assertEqual(page.data, 'Hello yo!')
@@ -124,10 +123,10 @@ class PagePostTests(unittest.TestCase):
     def test_page_post_create_page(self):
         from tutorial.models import Page
         _registerRoutes(self.config)
-        request = testing.DummyRequest(
-            post={'page': {'name': 'AnotherPage', 'data': 'Hello yo!'}}
-        )
+        request = testing.DummyRequest()
         request.matchdict = {'pagename': 'AnotherPage'}
+        json = {'page': {'name': 'AnotherPage', 'data': 'Hello yo!'}}
+        request.json = json
         self._callFUT(request)
         page = self.session.query(Page).filter_by(name='AnotherPage').one()
         self.assertEqual(page.data, 'Hello yo!')
@@ -144,8 +143,8 @@ class PageDeleteTests(unittest.TestCase):
         testing.tearDown()
 
     def _callFUT(self, request):
-        from tutorial.views import page_delete
-        return page_delete(request)
+        from tutorial.views import PageView
+        return PageView(request).delete()
 
     def test_page_post_delete_page(self):
         from tutorial.models import Page
@@ -179,7 +178,8 @@ class FunctionalTests(unittest.TestCase):
         self.assertTrue(b'page' in res.json)
 
     def test_unexisting_page(self):
-        self.testapp.get('/SomePage', status=404)
+        resp = self.testapp.get('/SomePage', status=200)
+        self.assertTrue(b'error' in resp.json_body)
 
     def test_root(self):
         res = self.testapp.get('/', status=200)
