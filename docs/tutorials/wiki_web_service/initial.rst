@@ -12,7 +12,12 @@ Let's start by making a simple change to the model to add an update timestamp.  
 
 Next we can modify our views.py
 
-1.  first
+1. Remove anything to do with authentication and authorization including login/logout views
+2. view_wiki now exists to serve a view that will use jquery ajax calls to interact with the wiki web service.
+3. The wiki web service views are implemented as a class with get, post, and delete methods that map to the corresponding HTTP verbs.
+4. Using a class takes advantage of the @view_defaults decorator to factor out the common name and renderer for each method.
+5. In the get method, which used to be the view_page method, we've removed the check function and converted the functionality of it to return a list of WikiWords via re.findall. The old view_page function assumed that the wiki would be consumed in the context of an HTML page. Web services should not make assumptions about the context that the data will be used. Therefore, the hardcoded html markup was removed.
+6. Note the use of request.json in the post method. WebOb will attempt to decode
 
 
 

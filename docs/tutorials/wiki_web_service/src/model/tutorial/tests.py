@@ -131,6 +131,16 @@ class PagePostTests(unittest.TestCase):
         page = self.session.query(Page).filter_by(name='AnotherPage').one()
         self.assertEqual(page.data, 'Hello yo!')
 
+    def test_page_post_bad_json_post_data(self):
+        from tutorial.models import Page
+        _registerRoutes(self.config)
+        request = testing.DummyRequest()
+        request.matchdict = {'pagename': 'AnotherPage'}
+        json = {'page': {'name': 'AnotherPage', 'data': 'Hello yo!'}}
+        request.json = json
+        self._call_view_under_test(request)
+        page = self.session.query(Page).filter_by(name='AnotherPage').one()
+        self.assertEqual(page.data, 'Hello yo!')
 
 class PageDeleteTests(unittest.TestCase):
 
@@ -142,7 +152,7 @@ class PageDeleteTests(unittest.TestCase):
         self.session.remove()
         testing.tearDown()
 
-    def _callFUT(self, request):
+    def _call_view_under_test(self, request):
         from tutorial.views import PageView
         return PageView(request).delete()
 
@@ -153,7 +163,7 @@ class PageDeleteTests(unittest.TestCase):
         self.session.add(page)
         request = testing.DummyRequest(method='DELETE')
         request.matchdict = {'pagename': 'AnotherPage'}
-        self._callFUT(request)
+        self._call_view_under_test(request)
         page = self.session.query(Page).filter_by(name='AnotherPage').all()
         self.assertEqual([], page)
 
@@ -184,3 +194,13 @@ class FunctionalTests(unittest.TestCase):
     def test_root(self):
         res = self.testapp.get('/', status=200)
         self.assertEqual(res.location, None)
+
+    def test_post(self):
+        import json
+        res = self.testapp.post_json(
+            '/',
+            params={'test': 'app'}
+            #{'page': {'name': 'AnotherPage', 'data': 'Hello yo!'}},
+        )
+        import sys; sys.stdout = sys.__stdout__; import pdb; pdb.set_trace()
+        #self.assert # something
