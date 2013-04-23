@@ -85,7 +85,6 @@ during application setup to specify the authentication policy.
 
 For example:
 
-.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -151,7 +150,6 @@ API:
 The equivalent view registration including the ``add`` permission name
 may be performed via the ``@view_config`` decorator:
 
-.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -333,7 +331,7 @@ A principal is usually a user id, however it also may be a group id if your
 authentication system provides group information and the effective
 :term:`authentication policy` policy is written to respect group information.
 For example, the
-:class:`pyramid.authentication.RepozeWho1AuthenicationPolicy` respects group
+:class:`pyramid.authentication.RepozeWho1AuthenticationPolicy` respects group
 information if you configure it with a ``callback``.
 
 Each ACE in an ACL is processed by an authorization policy *in the

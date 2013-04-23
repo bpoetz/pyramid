@@ -14,8 +14,8 @@ in various ways.
 Changing the Not Found View
 ---------------------------
 
-When :app:`Pyramid` can't map a URL to view code, it invokes a :term:`not
-found view`, which is a :term:`view callable`. The default Not Found View
+When :app:`Pyramid` can't map a URL to view code, it invokes a :term:`Not
+Found View`, which is a :term:`view callable`. The default Not Found View
 can be overridden through application configuration.
 
 If your application uses :term:`imperative configuration`, you can replace
@@ -25,15 +25,17 @@ the Not Found View by using the
 .. code-block:: python
    :linenos:
 
-   from helloworld.views import notfound
-   config.add_notfound_view(notfound)
+   def notfound(request):
+       return Response('Not Found, dude', status='404 Not Found')
 
-Replace ``helloworld.views.notfound`` with a reference to the :term:`view
-callable` you want to use to represent the Not Found View.  The :term:`not
-found view` callable is a view callable like any other.
+   def main(globals, **settings):
+       config = Configurator()
+       config.add_notfound_view(notfound)
+
+The :term:`Not Found View` callable is a view callable like any other.
 
 If your application instead uses :class:`pyramid.view.view_config` decorators
-and a :term:`scan`, you can replace the Not Found view by using the
+and a :term:`scan`, you can replace the Not Found View by using the
 :class:`pyramid.view.notfound_view_config` decorator:
 
 .. code-block:: python
@@ -46,8 +48,8 @@ and a :term:`scan`, you can replace the Not Found view by using the
        return Response('Not Found, dude', status='404 Not Found')
 
    def main(globals, **settings):
-      config = Configurator()
-      config.scan()
+       config = Configurator()
+       config.scan()
 
 This does exactly what the imperative example above showed.
 
@@ -109,9 +111,8 @@ callable:
    instance of the :exc:`~pyramid.httpexceptions.HTTPNotFound` exception that
    caused the Not Found View to be called.  The value of
    ``request.exception.message`` will be a value explaining why the Not Found
-   error was raised.  This message will be different when the
-   ``pyramid.debug_notfound`` environment setting is true than it is when it
-   is false.
+   error was raised.  This message has different values depending whether the
+   ``pyramid.debug_notfound`` environment setting is true or false.
 
 .. note::
 
@@ -155,12 +156,12 @@ forbidden view:
 .. code-block:: python
    :linenos:
 
-   from helloworld.views import forbidden_view
-   from pyramid.httpexceptions import HTTPForbidden
-   config.add_forbidden_view(forbidden_view)
+   def forbidden(request):
+       return Response('forbidden')
 
-Replace ``helloworld.views.forbidden_view`` with a reference to the Python
-:term:`view callable` you want to use to represent the Forbidden view.
+   def main(globals, **settings):
+       config = Configurator()
+       config.add_forbidden_view(forbidden_view)
 
 If instead you prefer to use decorators and a :term:`scan`, you can use the
 :class:`pyramid.view.forbidden_view_config` decorator to mark a view callable
@@ -208,9 +209,9 @@ Here's some sample code that implements a minimal forbidden view:
    that caused the forbidden view to be called.  The value of
    ``request.exception.message`` will be a value explaining why the forbidden
    was raised and ``request.exception.result`` will be extended information
-   about the forbidden exception.  These messages will be different when the
-   ``pyramid.debug_authorization`` environment setting is true than it is when
-   it is false.
+   about the forbidden exception.  These messages have different values
+   depending whether the ``pyramid.debug_authorization`` environment setting
+   is true or false.
 
 .. index::
    single: request factory
@@ -674,7 +675,7 @@ traverser.
 If you've added a traverser, you can change how
 :meth:`~pyramid.request.Request.resource_url` generates a URL for a specific
 type of resource by adding a call to
-:meth:`pyramid.config.add_resource_url_adapter`.
+:meth:`pyramid.config.Configurator.add_resource_url_adapter`.
 
 For example:
 
@@ -694,7 +695,7 @@ represents the type of interface that must be possessed by the resource for
 this resource url factory to be found.  If the ``resource_iface`` argument is
 omitted, this resource url adapter will be used for *all* resources.
 
-The API that must be implemented by your a class that provides
+The API that must be implemented by a class that provides
 :class:`~pyramid.interfaces.IResourceURL` is as follows:
 
 .. code-block:: python
@@ -930,7 +931,7 @@ set a *default* view mapper (overriding the superdefault view mapper used by
 Pyramid itself).
 
 A *single* view registration can use a view mapper by passing the mapper as
-the ``mapper`` argument to :meth:`~pyramid.config.Configuration.add_view`.
+the ``mapper`` argument to :meth:`~pyramid.config.Configurator.add_view`.
 
 .. index::
    single: configuration decorator
@@ -1036,7 +1037,7 @@ upstream WSGI component that uses :app:`Pyramid` as its "app".  This is a
 feature that may be used by Pyramid framework extensions, to provide, for
 example, Pyramid-specific view timing support bookkeeping code that examines
 exceptions before they are returned to the upstream WSGI application.  Tweens
-behave a bit like :term:`WSGI` middleware but they have the benefit of
+behave a bit like :term:`WSGI` :term:`middleware` but they have the benefit of
 running in a context in which they have access to the Pyramid
 :term:`application registry` as well as the Pyramid rendering machinery.
 
@@ -1110,8 +1111,8 @@ Once you've created a tween factory, you can register it into the implicit
 tween chain using the :meth:`pyramid.config.Configurator.add_tween` method
 using its :term:`dotted Python name`.
 
-Here's an example of registering the a tween factory as an "implicit"
-tween in a Pyramid application:
+Here's an example of registering a tween factory as an "implicit" tween in a
+Pyramid application:
 
 .. code-block:: python
    :linenos:
@@ -1447,7 +1448,7 @@ view/route predicate:
   subscriber predicates will assume a certain event type.
 
 Here's an example of a subscriber predicate that can be used in conjunction
-with a subscriber that subscribes to the :class:`pyramid.events.NewReqest`
+with a subscriber that subscribes to the :class:`pyramid.events.NewRequest`
 event type.
 
 .. code-block:: python
